@@ -1,0 +1,9 @@
+{
+ "method": "aes-128-cfb",
+ "port_password": {
+  "1192": "stone-rough-pause-swami",
+  "12345": "foobar",
+  "54321": "barfoo"
+ },
+ "timeout": 600
+}

@@ -1,0 +1,7 @@
+{
+ "method": "aes-128-cfb",
+ "timeout": 600,
+ "fast_open": true,
+ "mode": "tcp_and_udp"
+}
+

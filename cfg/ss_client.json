@@ -1,0 +1,10 @@
+{
+    "server": "128.199.94.105",
+    "server_port": 54321,
+    "local_address": "127.0.0.1",
+    "local_port": 1080,
+    "password": "barfoo",
+    "timeout": 600,
+    "method": "aes-128-cfb",
+    "fast_open": false
+}
