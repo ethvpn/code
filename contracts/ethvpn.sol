@@ -14,7 +14,7 @@ contract EthVPN{
 
 	struct VPNInfo{
 		string IPAddr; 	// give IP in plaintext initially
-		uint bandwidth;		
+		uint bandwidth;
 		string country;	// the more detailed, the better
 		address owner; 
 		uint maxUsers; 	// the maximum number of parallel users
@@ -43,6 +43,7 @@ contract EthVPN{
 	event EnableLock();
 	event DisableLock();
 	event NewVPNListed(uint VPNIndex, address owner);
+	event OwnerWithdraw(address owner, uint256 amount);
 
 	VPNInfo[] public VPNs;
 	VPNContract[] public contracts;
@@ -61,7 +62,7 @@ contract EthVPN{
 							string _country, 
 							uint _maxUsers, 
 							bool _accepting,
-							uint _fare) returns (bool success, uint VPNIndex){
+							uint _fare) public returns (bool success, uint VPNIndex){
 		VPNs.push(VPNInfo({	IPAddr: _IPAddr,
 							bandwidth: _bandwidth,
 							country: _country,
@@ -75,7 +76,7 @@ contract EthVPN{
 	}
 
 	// adjust fare for VPNs[index], only applicable to new users
-	function adjustFare(uint index, uint newFare) returns (bool){
+	function adjustFare(uint index, uint newFare) public returns (bool){
 		if (VPNs[index].owner != msg.sender)
 			throw;
 		VPNs[index].fare = newFare;
@@ -83,7 +84,7 @@ contract EthVPN{
 	}
 
 	// stop accepting rent requests
-	function stopAccepting(uint i) returns (bool){
+	function stopAccepting(uint i) public returns (bool){
 		if (VPNs[i].owner != msg.sender)
 		    return false;
 		VPNs[i].accepting = false;
@@ -91,7 +92,7 @@ contract EthVPN{
 	}
 	
 	// start accepting rent requests
-	function startAccepting(uint i) returns (bool){
+	function startAccepting(uint i) public returns (bool){
 		if (VPNs[i].owner != msg.sender)
 		    return false;
 		VPNs[i].accepting = true;
@@ -100,7 +101,7 @@ contract EthVPN{
 
 
 	// ========= FUNCTIONs for VPN USERs =============
-	function requestToRentVPN(uint index) returns (bool success, uint reqIndex){
+	function requestToRentVPN(uint index) payable public returns (bool success, uint reqIndex){
 		if (index >= VPNs.length)
 			throw;
 		if (msg.value < VPNs[index].fare)
@@ -123,7 +124,7 @@ contract EthVPN{
 	}
 
 	// cancel some request to get money back
-	function cancelRentRequest(uint reqIndex) returns (bool){
+	function cancelRentRequest(uint reqIndex) public returns (bool){
 		if (reqIndex >= contracts.length)
 			throw;
 		if (contracts[reqIndex].user != msg.sender)
@@ -142,7 +143,7 @@ contract EthVPN{
 	}
 
 	// top up some contract
-	function topupRentContract(uint reqIndex) returns (bool){
+	function topupRentContract(uint reqIndex) payable public returns (bool){
 		if (reqIndex >= contracts.length)
 			throw;		
 		if (contracts[reqIndex].terminated)
@@ -159,7 +160,7 @@ contract EthVPN{
 	}
 
 	// close the contract, and get the refund
-	function closeRentContract(uint reqIndex) returns (bool){
+	function closeRentContract(uint reqIndex) public returns (bool){
 		if (reqIndex >= contracts.length)
 			throw;
 		if (contracts[reqIndex].terminated)
@@ -191,7 +192,7 @@ contract EthVPN{
 
 	//========= Contract functions for VPN owner =====
 	// cancel some request to get money back
-	function acceptRentRequest(uint reqIndex, string _loginInfo) returns (bool){
+	function acceptRentRequest(uint reqIndex, string _loginInfo) public returns (bool){
 		if (reqIndex >= contracts.length)
 			throw;
 		if (contracts[reqIndex].starting != 0)
@@ -211,7 +212,7 @@ contract EthVPN{
 	}
 
 	// after the allottedTime, owner can terminate the contract and get the fare
-	function terminateRentContract(uint reqIndex) returns (bool){
+	function terminateRentContract(uint reqIndex) public returns (bool){
 		if (reqIndex >= contracts.length)
 			throw;
 		if (contracts[reqIndex].terminated)
@@ -238,16 +239,17 @@ contract EthVPN{
 	}
 
 	// other public function
-	function getBalance() constant returns (uint){
+	function getBalance() public constant returns (uint){
 		return balances[msg.sender];
 	}
 
-	function ownerWithdraw() returns (bool){
+	function ownerWithdraw() public returns (bool){
 		if (balances[msg.sender] > 0){
 			uint amount = balances[msg.sender];
-			balances[msg.sender] = 0;
-			msg.sender.send(amount);			
-		}
+			balances[msg.sender] = 0;	
+			msg.sender.send(amount);
+			OwnerWithdraw(msg.sender, amount);
+		}		
 		return true;
 	}
 
@@ -283,27 +285,27 @@ contract EthVPN{
 	}
 
 	//========= PLATFORM functions ==========
-	function adjustFees(uint _newfees) onlyAddress(owner) returns (bool){
+	function adjustFees(uint _newfees) onlyAddress(owner) public returns (bool){
 		fees = _newfees;
 		return true;
 	}
 	
-	function disableLock() onlyAddress(owner) returns (bool){
+	function disableLock() onlyAddress(owner) public returns (bool){
 		locked = false;
 		return true;
 	}
 	
-	function enableLock() onlyAddress(owner) returns (bool){
+	function enableLock() onlyAddress(owner) public returns (bool){
 		locked = true;
 		return true;
 	}
 	
-	function changeOwner(address newOwner) onlyAddress(owner) returns (bool){
+	function changeOwner(address newOwner) onlyAddress(owner) public returns (bool){
 	    owner = newOwner;
 	    return true;
 	}
 
-	function collectFees(address toAddr) onlyAddress(owner) returns (bool){
+	function collectFees(address toAddr) onlyAddress(owner) public returns (bool){
 		owner.send(totalFees);
 		return true;
 	}

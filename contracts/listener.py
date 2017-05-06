@@ -125,7 +125,7 @@ class ContractListener:
                 continue
 
             event_type = topics[0]
-            self.logger.warn("event signature: %s", event_type)
+            # self.logger.warn("event signature: %s", event_type)
             if event_type not in self.event_signatures:
                 self.logger.warn("Unknown event signature %s", change)
                 continue

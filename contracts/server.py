@@ -1,6 +1,6 @@
 import logging
 
-from userclient import ContractListener
+from listener import ContractListener
 from ethjsonrpc import EthJsonRpc
 
 
@@ -12,7 +12,7 @@ class EntityUpdater:
         self.client = client
         self.events = {
             "NewVPNListed": "NewVPNListed(uint256,address)",            
-            "NewRentRequest": "NewRentRequest(uint256,uint 256)",
+            "NewRentRequest": "NewRentRequest(uint256,uint256)",
             "TopupRentContract": "TopupRentContract(uint256)",
             "CloseRentContract": "CloseRentContract(uint256)",
             "TerminateRentContract": "TerminateRentContract(uint256)",
@@ -31,16 +31,21 @@ class EntityUpdater:
         """
         logger.info("Received contract event %s for %s", event, address)
 
-        if event == self.events["VerifyTokenSet"]:
-            txid = api_data["transactionHash"]
-            print "new tx created txid: %s\n" %txid
+        if event == self.events["NewRentRequest"]:            
+            data = api_data['data']
+            vpn_id = int(data[:66], 0)
+            req_id = int("0x"+data[66:], 0)
+            print "New Rent Request to VPN with id: %d in request with ID: %d\n" %(vpn_id, req_id)            
+
+
+
         elif event == self.events["NewVPNListed"]:
-            print api_data
-            # index = api_data["topics"][1]
-            # owner = api_data["topics"][2]
-            # txid = api_data["transactionHash"]
-            # print "new VPN listed in txid: %s\n" % txid
-            # print "VPN number %s listed by" %(index, owner)
+            data = api_data['data']
+            vpn_id = int(data[:66], 0)
+            owner_addr = "0x"+data[-40:]
+            txid = api_data["transactionHash"]
+            print "new VPN listed in txid: %s" % txid
+            print "VPN number %d listed by %s\n" %(vpn_id, owner_addr)
         else:
             raise RuntimeError("Unknown event: {}".format(event))
 
@@ -50,7 +55,7 @@ class EntityUpdater:
 
 
         # Get list of all known contracts in the database
-        contracts = ["0x12b8e248e6e831d649108c4d231757dc6da3d64a"]
+        contracts = ["0x3f989ec10cec3fd4d6794ac5f7cb327c12e2161e"]
 
         # Each callback will run in its own db transaction context
         for c in contracts:
