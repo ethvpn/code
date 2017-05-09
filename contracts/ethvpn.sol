@@ -40,10 +40,10 @@ contract EthVPN{
 	event TopupRentContract(uint rentReq);
 	event CloseRentContract(uint rentReq);
 	event TerminateRentContract(uint rentReq);
-	event EnableLock();
-	event DisableLock();
+	event EnabledLock();
+	event DisabledLock();
 	event NewVPNListed(uint VPNIndex, address owner);
-	event OwnerWithdraw(address owner, uint256 amount);
+	event OwnerWithdraw(address owner, uint amount);
 
 	VPNInfo[] public VPNs;
 	VPNContract[] public contracts;
@@ -195,6 +195,7 @@ contract EthVPN{
 	function acceptRentRequest(uint reqIndex, string _loginInfo) public returns (bool){
 		if (reqIndex >= contracts.length)
 			throw;
+		// terminate if the request has been accepted
 		if (contracts[reqIndex].starting != 0)
 			throw;
 		//check if the request has been terminated previously
@@ -292,12 +293,18 @@ contract EthVPN{
 	
 	function disableLock() onlyAddress(owner) public returns (bool){
 		locked = false;
+		DisabledLock();
 		return true;
 	}
 	
 	function enableLock() onlyAddress(owner) public returns (bool){
 		locked = true;
+		EnabledLock();
 		return true;
+	}
+
+	function getLock() public constant returns (bool){
+		return locked;
 	}
 	
 	function changeOwner(address newOwner) onlyAddress(owner) public returns (bool){
