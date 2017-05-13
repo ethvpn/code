@@ -30,3 +30,13 @@ Then from the terminal (or using a GUI like [ShadowsocksX-NG](https://github.com
 The `-l 1337` can be any local port of your choice.  Then, while ss-local is running, you open your operating system's proxy setting and specify a SOCKS5 proxy on IP address `127.0.0.1` (localhost) using local port `1337`.  No username and password.
 
 And Voila.  You're done.
+
+----
+# Related Work
+
+Aka: possible front-ends.
+
+* [uproxy](http://uproxy.org)
+* [ShadowSocks](https://github.com/shadowsocks/shadowsocks-libev)
+* [ShadowVPN](https://github.com/clowwindy/ShadowVPN)
+* [Mysterium](http://mysterium.network)
