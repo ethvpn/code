@@ -6,7 +6,7 @@ As a client, you must:
 
 ## 1. Get some of the digital currency "ether".
 
-Ether is the digital currency through which you'll make payments.  You can get ether from [coinbase](https://www.coinbase.com/join/52fbe721d358f6dda000010a).  If you use our link you'll get some free money to pay your first proxy!  Even if you don't use the proxy much, hold onto that ether, I hear it's [going up](https://coinmarketcap.com/currencies/ethereum/)!
+Ether (ETH) is the digital currency through which you'll make payments.  You can get ether from [coinbase](https://www.coinbase.com/join/52fbe721d358f6dda000010a).  If you use our link and buy $100 of ETH you'll get $10 in bitcoin!  Even if you don't use the proxy much, hold onto that ether, I hear [it's going up](https://coinmarketcap.com/currencies/ethereum/)!
 
 ## 2. Install a Shadowsocks client for your platform
 First, install the ShadowSocks client.  A list of clients is [here](https://shadowsocks.org/en/download/clients.html). 
