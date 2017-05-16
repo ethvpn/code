@@ -1,83 +1,128 @@
 import logging
 import string
-from listener import ContractListener
-from ethjsonrpc import EthJsonRpc
+import json
+from web3 import Web3, KeepAliveRPCProvider, IPCProvider
 import random
-
-logger = logging.getLogger(__name__)
-# ethvpnAddress = "0x3f989ec10cec3fd4d6794ac5f7cb327c12e2161e"
-# ethvpnContract = web3.eth.contract([{"constant":true,"inputs":[],"name":"getBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"VPNs","outputs":[{"name":"IPAddr","type":"string"},{"name":"bandwidth","type":"uint256"},{"name":"country","type":"string"},{"name":"owner","type":"address"},{"name":"maxUsers","type":"uint256"},{"name":"currUsers","type":"uint256"},{"name":"accepting","type":"bool"},{"name":"fare","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"index","type":"uint256"},{"name":"newFare","type":"uint256"}],"name":"adjustFare","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"enableLock","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"reqIndex","type":"uint256"}],"name":"terminateRentContract","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"ownerWithdraw","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"contracts","outputs":[{"name":"VPNIndex","type":"uint256"},{"name":"initialFare","type":"uint256"},{"name":"starting","type":"uint256"},{"name":"allottedTime","type":"uint256"},{"name":"deposit","type":"uint256"},{"name":"user","type":"address"},{"name":"terminated","type":"bool"},{"name":"loginInfo","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"reqIndex","type":"uint256"}],"name":"closeRentContract","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"i","type":"uint256"}],"name":"startAccepting","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_IPAddr","type":"string"},{"name":"_bandwidth","type":"uint256"},{"name":"_country","type":"string"},{"name":"_maxUsers","type":"uint256"},{"name":"_accepting","type":"bool"},{"name":"_fare","type":"uint256"}],"name":"registerVPN","outputs":[{"name":"success","type":"bool"},{"name":"VPNIndex","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"VPNIndex","type":"uint256"}],"name":"getVPNInfo","outputs":[{"name":"IPAddr","type":"string"},{"name":"bandwidth","type":"uint256"},{"name":"country","type":"string"},{"name":"owner","type":"address"},{"name":"maxUsers","type":"uint256"},{"name":"currUsers","type":"uint256"},{"name":"accepting","type":"bool"},{"name":"fare","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"reqIndex","type":"uint256"}],"name":"topupRentContract","outputs":[{"name":"","type":"bool"}],"payable":true,"type":"function"},{"constant":false,"inputs":[{"name":"reqIndex","type":"uint256"},{"name":"_loginInfo","type":"string"}],"name":"acceptRentRequest","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"getNumberOfVPN","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"getNumberOfReq","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_newfees","type":"uint256"}],"name":"adjustFees","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"fees","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"toAddr","type":"address"}],"name":"collectFees","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"changeOwner","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"index","type":"uint256"}],"name":"requestToRentVPN","outputs":[{"name":"success","type":"bool"},{"name":"reqIndex","type":"uint256"}],"payable":true,"type":"function"},{"constant":false,"inputs":[{"name":"i","type":"uint256"}],"name":"stopAccepting","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"disableLock","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"locked","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"reqIndex","type":"uint256"}],"name":"cancelRentRequest","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"inputs":[{"name":"_fees","type":"uint256"}],"payable":false,"type":"constructor"},{"payable":false,"type":"fallback"},{"anonymous":false,"inputs":[{"indexed":false,"name":"VPNIndex","type":"uint256"},{"indexed":false,"name":"rentReq","type":"uint256"}],"name":"NewRentRequest","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"rentReq","type":"uint256"},{"indexed":false,"name":"loginInfo","type":"string"}],"name":"AcceptedRentRequest","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"VPNIndex","type":"uint256"},{"indexed":false,"name":"rentReq","type":"uint256"}],"name":"CanceledRentRequest","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"rentReq","type":"uint256"}],"name":"TopupRentContract","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"rentReq","type":"uint256"}],"name":"CloseRentContract","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"rentReq","type":"uint256"}],"name":"TerminateRentContract","type":"event"},{"anonymous":false,"inputs":[],"name":"EnableLock","type":"event"},{"anonymous":false,"inputs":[],"name":"DisableLock","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"VPNIndex","type":"uint256"},{"indexed":false,"name":"owner","type":"address"}],"name":"NewVPNListed","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"owner","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"OwnerWithdraw","type":"event"}])
-# ethvpn = ethvpnContract(address=ethvpnAddress)
+import sys
+from web3.utils.compat import (
+    Timeout,
+)
+unlockpassword = "smartpool"
 
 def rands(n):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(n))
 
-def acceptRentRequest(client, reqId):
+def genNewAccount():
     username = rands(6)
     password = rands(8)
     loginInfo = username + " " + password
-
-
+    return loginInfo
 
 class EntityUpdater:
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, web3):
+        self.web3 = web3
+        self.web3.eth.defaultAccount = self.web3.eth.coinbase
+        ethvpnAddress = "0x369b2e33549445db7e676504efd3ba7aee5896ba"
+        json_data=open("ethvpn.json").read()
+        contractABI = json.loads(json_data)
+        self.ethvpn = web3.eth.contract(abi=contractABI, address=ethvpnAddress)
+
         self.events = {
             "NewVPNListed": "NewVPNListed(uint256,address)",
-            "NewRentRequest": "NewRentRequest(uint256,uint256)",
+            "NewRentRequest": "event NewRentRequest(uint256,address,uint256);",
             "TopupRentContract": "TopupRentContract(uint256)",
             "CloseRentContract": "CloseRentContract(uint256)",
             "TerminateRentContract": "TerminateRentContract(uint256)",
             "AcceptedRentRequest": "AcceptedRentRequest(uint256,string)"
-        }
-
-        self.contract_listener = ContractListener(self.client, self.events.values(), self.on_blockchain_event)
-
-    def on_blockchain_event(self, address, event, api_data):
-        """Called by ContractLister to tell us about the contract events.
-
-        :param address: Contract address as a hex string
-        :param event: One of event signatures
-        :param api_data: eth_getFilterChanges() result https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterchanges
-        :return:
-        """
-        logger.info("Received contract event %s for %s", event, address)
-
-        if event == self.events["NewRentRequest"]:            
-            data = api_data['data']
-            vpn_id = int(data[:66], 0)
-            req_id = int("0x"+data[66:], 0)
-            print "New Rent Request to VPN with id: %d in request with ID: %d\n" %(vpn_id, req_id)
+        }        
 
 
-        elif event == self.events["NewVPNListed"]:
-            data = api_data['data']
-            vpn_id = int(data[:66], 0)
-            owner_addr = "0x"+data[-40:]
-            txid = api_data["transactionHash"]
-            print "new VPN listed in txid: %s" % txid
-            print "VPN number %d listed by %s\n" %(vpn_id, owner_addr)
-        else:
-            raise RuntimeError("Unknown event: {}".format(event))
-
-    def update_all(self):
-        """Poll geth and get updates for the contracts in our database."""
-        updates = 0
-
-
-        # Get list of all known contracts in the database
-        contracts = ["0x3f989ec10cec3fd4d6794ac5f7cb327c12e2161e"]
-
-        # Each callback will run in its own db transaction context
-        for c in contracts:
-            updates += self.contract_listener.monitor_contract(c)
-
-        updates += self.contract_listener.poll()
-
-        return updates
 
 if __name__ == '__main__':
-    client = EthJsonRpc('127.0.0.1', 8545)
-    anInstance = EntityUpdater(client)
-    anInstance.update_all()
+    # web3 = EthJsonRpc('127.0.0.1', 8545)
+    web3 = Web3(KeepAliveRPCProvider(host='localhost', port='8545'))    
+    anInstance = EntityUpdater(web3)    
+    web3.eth.defaultAccount = web3.eth.coinbase
+    ethvpnAddress = "0x369b2e33549445db7e676504efd3ba7aee5896ba"
+    json_data=open("ethvpn.json").read()
+    contractABI = json.loads(json_data)
+    ethvpn = web3.eth.contract(abi=contractABI, address=ethvpnAddress)
+
+    while True:
+        input_line = raw_input("command: ")        
+        if input_line == "exit" or input_line == "quit":
+            break
+        else:
+            args = input_line.split()
+            # print args
+            # list all vpns available
+            if args[0] == "list-vpns":
+                print "Listing all VPNS\n"
+                no_vpns = ethvpn.call().getNumberOfVPN()
+                print "The number of VPNs: %d\n" %no_vpns
+                for index in range(no_vpns):                    
+                    print "VPN %s info:"%index + str(ethvpn.call().getVPNInfo(index))
+
+            # register a VPN
+            elif args[0] == "register":
+                print "Register a new VPN"
+                if len(args) != 7:
+                    print "Invalid. Expecting 6 arguments: IP, bandwidth, region, maxuser, accepting, fare per hour \n"
+                else:
+                    print "Registering a VPN at IP: %s, bandwidth %s Mbps, region %s, maxuser %s, accepting: %s, fare %s per hour \n"\
+                %(args[1], args[2], args[3], args[4], args[5], args[6])
+                web3.personal.unlockAccount(web3.eth.coinbase, unlockpassword)
+                txAddr = ethvpn.transact({'from': web3.eth.coinbase, 'gas': 2000000}).registerVPN(str(args[1]),\
+                    int(args[2]), str(args[3]), int(args[4]), bool(int(args[5])), int(args[6]))
+                print "Done, TX's ID: %s\n" %txAddr
+
+            # view all requests
+            elif args[0] == "list-reqs":
+                print "List all requests"
+                if len(args) == 2:
+                    print "List all requests to VPNs %s\n" %(args[1])
+                else:
+                    print "Invalid. Expecting a VPN index\n"
+                no_reqs = ethvpn.call().getNumberOfReq()
+                print "Total requests: %d\n" %no_reqs
+                for index in range(no_reqs):
+                    print "VPN %s info:"%index + str(ethvpn.call().getVPNInfo(index))
+
+
+            #send rent request
+            elif args[0] == "send-req":
+                if len(args) != 3:
+                    print "Invalid! Expect 2 arguments: VPNIndex and amount\n"
+                    continue
+                print "Sending request to rent VPN %s with %s ETH\n" %(args[1], args[2])
+                web3.personal.unlockAccount(web3.eth.accounts[1], unlockpassword)
+                txAddr = ethvpn.transact({'from': web3.eth.coinbase, 'value': web3.toWei(int(args[2]), "ether"), 'gas': 1000000}).requestToRentVPN(int(args[1]))
+                print "Done, TX's ID: %s\n" %txAddr
+
+            #view status of rent request
+            elif args[0] == "view-req":
+                if len(args) != 2:
+                    print "Invalid! Expect 1 arguments: VPNIndex."
+                    continue
+                print "Viewing status of rent request no: %s\n" %(args[1])
+
+            # accept a rent request
+            elif args[0] == "acc-req":
+                if len(args) != 3:
+                    print "Invalid! Expect 2 arguments: reqIndex and loginInfo.\n"
+                    continue
+                print "Accepting rent request no: %s with loginInfo %s\n" %(args[1], args[2])
+                
+                web3.personal.unlockAccount(web3.eth.coinbase, unlockpassword)
+                txAddr = ethvpn.transact({'from': web3.eth.coinbase, 'gas': 1000000}).acceptRentRequest(int(args[1]), args[2])
+                print "Done, TX's ID: %s\n" %txAddr
+
+            #terminate a contract
+            elif args[0] == "terminate":
+                if len(args) != 2:
+                    print "Invalid! Expect 1 arguments: VPNIndex."
+                    continue
+                print "Terminating contract no: %s\n" %(args[1])
+            else:
+                print "Invalid command!\n"

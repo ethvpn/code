@@ -34,15 +34,15 @@ contract EthVPN{
 		string loginInfo;	
 	}
 
-	event NewRentRequest(uint VPNIndex, uint rentReq);
-	event AcceptedRentRequest(uint rentReq, string loginInfo);
-	event CanceledRentRequest(uint VPNIndex, uint rentReq);
-	event TopupRentContract(uint rentReq);
-	event CloseRentContract(uint rentReq);
-	event TerminateRentContract(uint rentReq);
+    event NewVPNListed(uint VPNIndex, address indexed owner);
+	event NewRentRequest(uint VPNIndex, address indexed owner, uint rentReq);
+	event AcceptedRentRequest(uint rentReq, address indexed owner, string loginInfo, address indexed user);
+	event CanceledRentRequest(uint VPNIndex, address indexed owner, uint rentReq);
+	event TopupRentContract(uint rentReq, address indexed owner, address indexed user);
+	event CloseRentContract(uint rentReq, address indexed owner, address indexed user);
+	event TerminateRentContract(uint rentReq, address indexed owner, address indexed user);
 	event EnabledLock();
 	event DisabledLock();
-	event NewVPNListed(uint VPNIndex, address owner);
 	event OwnerWithdraw(address owner, uint amount);
 
 	VPNInfo[] public VPNs;
@@ -119,7 +119,7 @@ contract EthVPN{
 									allottedTime: _allottedTime,
 									loginInfo: ''}));
 
-		NewRentRequest(index, contracts.length-1);
+		NewRentRequest(index, VPNs[index].owner, contracts.length-1);
 		return (true, contracts.length-1);
 	}
 
@@ -138,7 +138,8 @@ contract EthVPN{
 		// do not need to check the send
 		// its the sender's responsibility to receive the refund
 		msg.sender.send(contracts[reqIndex].deposit);
-		CanceledRentRequest(contracts[reqIndex].VPNIndex, reqIndex);
+		uint VPNIndex = contracts[reqIndex].VPNIndex;
+		CanceledRentRequest(contracts[reqIndex].VPNIndex, VPNs[VPNIndex].owner, reqIndex);
 		return true;
 	}
 
@@ -155,7 +156,7 @@ contract EthVPN{
 
 		contracts[reqIndex].deposit += msg.value;
 		contracts[reqIndex].allottedTime += contracts[reqIndex].deposit/VPNs[VPNIndex].fare;
-		TopupRentContract(reqIndex);
+		TopupRentContract(reqIndex, VPNs[VPNIndex].owner, msg.sender);
 		return true;
 	}
 
@@ -186,7 +187,7 @@ contract EthVPN{
 		VPNs[VPNIndex].currUsers -= 1;
 		if (refund > 0)
 			msg.sender.send(refund);
-		CloseRentContract(reqIndex);
+		CloseRentContract(reqIndex, VPNs[VPNIndex].owner, msg.sender);
 		return true;
 	}
 
@@ -208,7 +209,7 @@ contract EthVPN{
 		contracts[reqIndex].starting = now;
 		contracts[reqIndex].loginInfo = _loginInfo;
 		VPNs[VPNIndex].currUsers += 1;
-		AcceptedRentRequest(reqIndex, _loginInfo);
+		AcceptedRentRequest(reqIndex, VPNs[VPNIndex].owner, _loginInfo,  contracts[reqIndex].user);
 		return true;
 	}
 
@@ -235,7 +236,7 @@ contract EthVPN{
 		totalFees += totalCost - (totalCost*(1000-fees))/1000;
 		contracts[reqIndex].terminated = true;
 		VPNs[VPNIndex].currUsers -= 1;
-		TerminateRentContract(reqIndex);
+		TerminateRentContract(reqIndex, VPNs[VPNIndex].owner, msg.sender);
 		return true;
 	}
 
@@ -283,6 +284,20 @@ contract EthVPN{
 
 	function getNumberOfReq() public constant returns (uint){
 		return contracts.length;
+	}
+
+	function getReqInfo(uint reqIndex) public constant returns (uint VPNIndex,
+														uint amount,																
+														address user,
+														bool approved){
+		if (reqIndex >= contracts.length)
+			throw;
+		// uint VPNIndex = contracts[reqIndex].VPNIndex;
+		// Con vpn = VPNs[VPNIndex];
+		return (contracts[reqIndex].VPNIndex, 
+				contracts[reqIndex].deposit,
+				contracts[reqIndex].user,
+				contracts[reqIndex].starting != 0);
 	}
 
 	//========= PLATFORM functions ==========
