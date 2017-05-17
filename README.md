@@ -37,6 +37,7 @@ And Voila.  You're done.
 Aka: possible front-ends.
 
 * [uproxy](http://uproxy.org)
+* [Streisand](https://github.com/jlund/streisand)
 * [ShadowSocks](https://github.com/shadowsocks/shadowsocks-libev)
 * [ShadowVPN](https://github.com/clowwindy/ShadowVPN)
 * [Mysterium](http://mysterium.network)
