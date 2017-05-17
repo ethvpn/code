@@ -289,7 +289,9 @@ contract EthVPN{
 	function getReqInfo(uint reqIndex) public constant returns (uint VPNIndex,
 														uint amount,																
 														address user,
-														bool approved){
+														bool approved,
+														string loginInfo,
+														bool terminated){
 		if (reqIndex >= contracts.length)
 			throw;
 		// uint VPNIndex = contracts[reqIndex].VPNIndex;
@@ -297,7 +299,9 @@ contract EthVPN{
 		return (contracts[reqIndex].VPNIndex, 
 				contracts[reqIndex].deposit,
 				contracts[reqIndex].user,
-				contracts[reqIndex].starting != 0);
+				contracts[reqIndex].starting != 0,
+				contracts[reqIndex].loginInfo,
+				contracts[reqIndex].terminated);
 	}
 
 	//========= PLATFORM functions ==========
