@@ -1,3 +1,5 @@
+_Warning: EthVPN is only in alpha stage.  Don't use it for anything important._
+
 # ethvpn
 The package for running a VPN connection with ShadowSocks via Ethereum.
 
