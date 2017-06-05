@@ -11,7 +11,7 @@ The `ethvpn` contract is currently deployed on Rinkeby testnet at this address `
 You need to start your fullnode with `rpc` and the  "db,eth,net,web3,personal" rpc-apis enabled. Particularly, since currently only Geth supports Rinkeby, you need to run:
 
 ```
-geth --networkid=4 --datadir=your-data-dir --syncmode=light --ethstats='ethvpn:Respect my authoritah!@stats.rinkeby.io' --bootnodes=enode://a24ac7c5484ef4ed0c5eb2d36620ba4e4aa13b8c84684e1b4aab0cebea2ae45cb4d375b77eab56516d34bfbd3c1a833fc51296ff084b770b94fb9028c4d25ccf@52.169.42.101:30303?discport=30304 --rpc --rpcapi "db,eth,net,web3,personal"
+geth --rinkeby --ethstats='ethvpn:Respect my authoritah!@stats.rinkeby.io' --bootnodes=enode://a24ac7c5484ef4ed0c5eb2d36620ba4e4aa13b8c84684e1b4aab0cebea2ae45cb4d375b77eab56516d34bfbd3c1a833fc51296ff084b770b94fb9028c4d25ccf@52.169.42.101:30303?discport=30304 --rpc --rpcapi "db,eth,net,web3,personal"
 ```
 
 ## Step 3. Change your pass-phrase to unlock your account
@@ -61,3 +61,10 @@ e.g.
 ```
 command: close-contract 0
 ```
+
+---
+
+```
+geth --networkid=4 --datadir=your-data-dir --syncmode=light --ethstats='ethvpn:Respect my authoritah!@stats.rinkeby.io' --bootnodes=enode://a24ac7c5484ef4ed0c5eb2d36620ba4e4aa13b8c84684e1b4aab0cebea2ae45cb4d375b77eab56516d34bfbd3c1a833fc51296ff084b770b94fb9028c4d25ccf@52.169.42.101:30303?discport=30304 --rpc --rpcapi "db,eth,net,web3,personal"
+```
+
