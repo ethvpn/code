@@ -16,7 +16,7 @@ class ShadowSocksManager():
 
 		self.MIN_PORT_NUMBER, self.MAX_PORT_NUMBER = 1024, 2048
 		self.MAX_PASSWORD_LENGTH = 28
-		self.PASSWORD_NUMBER_OF_WORDS = 4
+		self.PASSWORD_NUMBER_OF_WORDS = 3
 
 		#self.SOCKET_BUFFER_SIZE = 1506
 		self.SOCKET_BUFFER_SIZE = 4096
@@ -158,7 +158,7 @@ class ShadowSocksManager():
 		###############################################################################
 		# 2. generate the new password
 		###############################################################################
-		new_password = xp.generate_xkcdpassword( self.xkcd_wordlist, numwords=self.PASSWORD_NUMBER_OF_WORDS, delimiter='-' )
+		new_password = xp.generate_xkcdpassword( self.xkcd_wordlist, numwords=self.PASSWORD_NUMBER_OF_WORDS, delimiter='_' )
 
 
 		# send these to the server
