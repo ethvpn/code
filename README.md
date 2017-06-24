@@ -43,3 +43,4 @@ Aka: possible front-ends.
 * [ShadowSocks](https://github.com/shadowsocks/shadowsocks-libev)
 * [ShadowVPN](https://github.com/clowwindy/ShadowVPN)
 * [Mysterium](http://mysterium.network)
+* [Hola](https://hola.org)
