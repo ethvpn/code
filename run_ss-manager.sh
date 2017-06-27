@@ -2,7 +2,7 @@
 
 
 ss_manager_address=/var/run/ss-manager.sock
-
+ss_server_config=cfg/ss_server.json
 
 my_ip_address=$(dig +short myip.opendns.com @resolver1.opendns.com.)
 
@@ -14,4 +14,3 @@ ss-manager --manager-address $ss_manager_address --executable $(which ss-server)
 #ss-manager --manager-address $ss_manager_address --executable $(which ss-server)
 
 echo "Done!"
-
